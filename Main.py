@@ -45,7 +45,6 @@ class Player:
         while True:
             edible_items = []
 
-            # Build list of edible items
             for item_name, amount in self.inventory.items():
                 if amount > 0 and ITEM_DATA.get(item_name, {}).get("type") == "food":
                     edible_items.append(item_name)
