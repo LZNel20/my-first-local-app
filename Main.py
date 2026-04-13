@@ -93,7 +93,8 @@ ITEM_DATA = {
     "Stick": {"type": "material"},
     "Iron": {"type":"material"},
     "Coal": {"type":"material"},
-    "Copper": {"type":"material"}}
+    "Diamonds": {"type":"material"},
+    "Emeralds": {"type":"material"}}
 
 #####################################
 ###          Cave Code           ###
@@ -157,34 +158,41 @@ def deep_cave():
     area = "deep cave"
     location = "!lost"
     while True:
-        deep_cave_choice = input("You come to a large body of crystal clear water. The stream you were following pours into the pond rippling the water, the noise echoing off the walls. \n A: Look around, B: Turn back, " )
+        deep_cave_choice = input("You come to a large body of crystal clear water. The stream you were following pours into the pond rippling the water, the noise echoing off the walls. \n A: Look around, B: Turn back to the stream, " )
         event_chance = ["event", "clear"]
         random_event = random.choice(event_chance)
         if deep_cave_choice.strip().lower() == "a":
             if random_event == "event":
                 print("The ground beneath you begins to shake until the floor cracks below you. Suddenly the ground gives out and you fall into the darkness.")
-                dark_cave(area, location)
+                deep_cave_choice = input("As you land you look around, you can barly see infront of you, the only light that seems to be in the cave is from the hole you fell through. \n A: Feel around in the dark, B: Try and climb back up the hole ")
+                if deep_cave_choice.strip().lower() == "a":
+                    dark_cave()
+
+                elif deep_cave_choice.strip().lower() == "b":
+                    print("You try to climb back up the hole. Unfortunately it seems to steep to climb.")
+                    dark_cave()
+                    
             elif random_event == "clear":
                 items_list = ["a rock", "a bug", "copper", "coal", "iron"]
                 random_item = random.choice(items_list)
                 print(f"You found: {random_item}!")
                 if random_item == "a rock":
-                    print("+1 rock!")
-                    player.add_item("Rock", 1)
+                    print("+3 rock!")
+                    player.add_item("Rock", 3)
                     choice(area, location)
                 if random_item == "copper":
-                    print("+1 copper")
-                    player.add_item("Copper", 1)
+                    print("+2 copper")
+                    player.add_item("Copper", 2)
                     choice(area, location)
                 
                 if random_item == "iron":
-                    print("+1 iron!")
-                    player.add_item("Iron", 1)
+                    print("+3 iron!")
+                    player.add_item("Iron", 3)
                     choice(area, location)
                 
                 if random_item == "coal":
-                    print("+1 coal!")
-                    player.add_item("Coal", 1)
+                    print("+2 coal!")
+                    player.add_item("Coal", 2)
                     choice(area, location)
                 
                 else:
@@ -195,17 +203,57 @@ def deep_cave():
 
         elif deep_cave_choice.strip().lower() == "b":
             print("You look at the pond for a moment longer before retracing your steps back to where you were.")
-            choice(area, location)
+            cave_water()
 
-def dark_cave(area, location):
+def dark_cave():
     area = "Dark Cave"
     location = "lost"
     while True:
-        deep_cave_choice = input("As you land you look around, you can barly see infront of you, the only light that seems to be in the cave is from the hole you fell through. \n A: Feel around in the dark, B: Try and climb back up the hole ")
-        if deep_cave_choice.strip().lower() == "a":
-            print("You feel around in dark for anything.")
-        if deep_cave_choice.strip().lower() == "b":
-            print("You try to climb back up the hole. Unfortunately it seems to steep to climb.")
+        print("You feel around in dark for anything.")
+        event_chance = ["event", "clear", "clear", "clear", "clear", "clear"]
+        random_event = random.choice(event_chance)
+        if random_event == "event":
+            print("You find hole that you are able to climb up, returning back to the original part of the cave.")
+            deep_cave()
+        elif random_event == "clear":
+            items_list = ["a rock", "a bug", "copper", "coal", "iron", "diamonds", "emeralds", "nothing"]
+            random_item = random.choice(items_list)
+            if random_item == "a rock":
+                print("+3 rock!")
+                player.add_item("Rock", 3)
+
+
+            if random_item == "copper":
+                print("+2 copper")
+                player.add_item("Copper", 3)
+
+            
+            if random_item == "iron":
+                print("+3 iron!")
+                player.add_item("Iron", 2)
+                choice(area, location)
+            
+            if random_item == "coal":
+                print("+2 coal!")
+                player.add_item("Coal", 3)
+                choice(area, location)
+            
+            if random_item == "coal":
+                print("+1 diamonds!")
+                player.add_item("Diamonds", 1)
+                choice(area, location)
+            
+            if random_item == "emeralds":
+                print("+1 emeralds!")
+                player.add_item("Emeralds", 1)
+                choice(area, location)
+
+            if random_item == "nothing":
+                print("You found nothing.")
+                choice(area, location)
+                
+
+        
 
 #####################################
 ###         Forest Code          ###
@@ -291,6 +339,8 @@ def choice(area, location):
                 explore_forest()
             elif area == "deep cave":
                 deep_cave()
+            elif area == "Dark Cave":
+                dark_cave()
                 
             else:
                 print("Error")
