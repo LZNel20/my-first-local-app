@@ -1,11 +1,51 @@
 import random
 
+class Weapon:
+    def __init__(self, name, min_damage, max_damage, crit_chance = 0.2):
+        self.name = name
+        self.min_damage = min_damage
+        self.max_damage = max_damage
+        self.crit_chance = crit_chance
+        
+
+    def roll_damage(self, dodging):
+        if dodging == True:
+            damage = random.randint(0, 3)
+            return damage
+        
+        damage = random.randint(self.min_damage, self.max_damage)
+            
+        if random.random() == 0:
+            print("You missed!")
+
+        elif random.random() < self.crit_chance:
+            print(" CRITICAL HIT!")
+            damage *= 2
+
+        return damage
+
 class Player:
-    def __init__(self):
+    dc_visits = 1
+    #Basic stuff
+    def __init__(self, weapons):
+        self.weapons = weapons
+        self.equipped_weapon = weapons[0] if weapons else None
         self.max_health = 35
         self.health = self.max_health
         self.inventory = {}
-        
+
+    #Damage stuff
+    def take_damage(self, amount):
+        self.health = max(0, self.health - amount)
+    
+    def equip_weapon(self, weapon_name):
+        for w in self.weapons:
+            if w.name.lower() == weapon_name.lower():
+                self.equipped_weapon = w
+                print(f"Equipped: {self.equipped_weapon.name}")
+                return
+        print("Weapon not found.")
+    
     # Inventory stuff
     def add_item(self, item_name, amount=1):
         self.inventory[item_name] = self.inventory.get(item_name, 0) + amount
@@ -79,11 +119,13 @@ class Player:
             if not found:
                 print("Invalid choice.")
 
-player = Player()
+class Mercenary:
+
 
 ITEM_DATA = {
     "Bow": {"type": "Weapon"},
     "Sword": {"type": "Weapon"},
+    "Bear fur coat": {"type": "Armor"},
     "Apple": {"type": "food", "heal": 5},
     "Meat": {"type": "food", "heal": 10},
     "Berry": {"type": "food", "heal": 3},
@@ -207,16 +249,21 @@ def deep_cave():
 
 def dark_cave():
     area = "Dark Cave"
-    location = "lost"
+    if player.dc_visits == 1:
+        location = "lost"
+    else:
+        location = "!Lost"
     while True:
         print("You feel around in dark for anything.")
         event_chance = ["event", "clear", "clear", "clear", "clear", "clear"]
         random_event = random.choice(event_chance)
         if random_event == "event":
             print("You find hole that you are able to climb up, returning back to the original part of the cave.")
+            player.dc_visits += 1 
+            
             deep_cave()
         elif random_event == "clear":
-            items_list = ["a rock", "a bug", "copper", "coal", "iron", "diamonds", "emeralds", "nothing"]
+            items_list = ["a rock", "a bug", "copper", "coal", "iron", "diamonds", "emeralds", "nothing", "The Draco Lair"]
             random_item = random.choice(items_list)
             if random_item == "a rock":
                 print("+3 rock!")
@@ -263,7 +310,7 @@ def explore_forest():
    area = "forest"
    location = "!Lost"
    while True:
-        items_list = ["an apple", "a rock", "a stick", "fur", "a bug", "a deer", "a bear!", "berries"]
+        items_list = ["an apple", "a rock", "a stick", "fur", "a bug", "a deer", "a bear!", "berries", "a trap!"]
         random_item = random.choice(items_list)
         
 
@@ -272,28 +319,30 @@ def explore_forest():
             print("+1 apple!")
             player.add_item("Apple", 1)
             choice(area, location)
-        if random_item == "fur": 
+        elif random_item == "fur": 
             print("+1 fur!")
             player.add_item("Fur", 1)
             choice(area, location)
 
-        if random_item == "a rock": 
+        elif random_item == "a rock": 
            print("+1 rock!")
            player.add_item("Rock", 1)
            choice(area, location)
-        if random_item == "a stick": 
+        elif random_item == "a stick": 
             print("+1 stick!")
             player.add_item("Stick", 1)
             choice(area, location)
-        if random_item == "berries": 
+        elif random_item == "berries": 
             print("+3 Berries!")
             player.add_item("Berry", 3)
             choice(area, location)
          
-        if random_item == "a bear!":
-            print("bear_encounter()")
+        elif random_item == "a bear!":
+            bear_encounter(area, location)
         elif random_item == "a deer":
             deer_encounter(area, location)
+        elif random_item == "a trap!":
+            choice(area, location)
         else:
             choice(area, location)
 
@@ -326,6 +375,99 @@ def deer_encounter(area, location):
         print("You admire the deer a little bit longer, then, with a snap of a twig, the deer runs of into the tree line.")
         choice(area, location)
 
+def bear_fight(area, location):
+    bear_health = 50
+    while bear_health > 0 and player.health > 0:
+        dodging = False
+        action = input("A. Attack  B. Dodge  C. Switch Weapon: ").lower().strip() #input("You take out your sword and attack the bear. ")
+        if action.lower().strip() == "a":
+            damage = player.equipped_weapon.roll_damage(dodging)
+            bear_attack = random.randint(0, 6)
+            if bear_attack == 0:
+                print("The bear missed!")
+                bear_health = max(0, bear_health - damage)
+                print(f"You did {damage} damage")
+                print(f"Current health: {player.health}. Current bear health: {bear_health}.")
+            elif bear_attack >= 1:
+                player.take_damage(bear_attack)
+                print(f"bear did {bear_attack} damage.")
+                bear_health = max(0, bear_health - damage)
+                print(f"You did {damage} damage")
+                print(f"Current health: {player.health}. Current bear health: {bear_health}.")
+        elif action.lower().strip() == "b":
+            if random.randint(1, 6) >= 4:
+                dodging = True
+                print("Successful dodge!")
+                damage = player.equipped_weapon.roll_damage(dodging)
+                bear_health = max(0, bear_health - damage)
+                print(f"You did {damage} damage")
+                print(f"Current health: {player.health}. Current bear health: {bear_health}.")
+            else:
+                print("You failed to dodge!")
+                bear_attack = random.randint(3, 10)
+                player.take_damage(bear_attack)
+                print(f"Bear did {bear_attack} damage!")
+                print(f"Current health: {player.health}. Current bear health: {bear_health}.")
+        elif action == "c":
+            for w in player.weapons:
+                if w == player.equipped_weapon:
+                    print(f"- {w.name} (Equipped)")
+                else:
+                    print(f"- {w.name}")
+
+            new_weapon = input("Which weapon would you like to equip? ")
+            player.equip_weapon(new_weapon)
+        else:
+            print("Error please input A, B, or C.")
+           
+    if player.health <= 0: 
+        player.health = 0
+        print("You died!") 
+        quit()
+    elif bear_health <= 0:
+        bear_health = 0
+        print("You defeated the bear!")
+        if "Bear fur coat" not in player.inventory:
+            bear_defeat(area, location)
+        else:
+            print("+5 Fur")
+            player.add_item("Fur", 5)
+            choice(area, location)
+
+                
+def bear_encounter(area, location):
+    while True:
+        print("The bear is attacking!")
+        battle_choice = input("What will you do? A: Fight. B: Run. ")
+        if battle_choice.lower().strip() == "a":
+            bear_fight(area, location)
+        elif battle_choice.lower().strip() == "b":
+            print("You attempt to run from the bear.")
+            escape_number = random.choice(range(1, 7))
+            print(f"You rolled a {escape_number}")
+            if escape_number >= 4:
+                print("You escaped the bear!")
+                choice(area, location)
+            else:
+                print("You failed to escape the bear!")
+                player.take_damage(random.randint(1, 6))
+                bear_fight(area, location)
+        else: 
+            print("Error please pick A or B")
+
+def bear_defeat(area, location):
+    player_choice = input("The bear lays dead infront of you. What will you do to it? A: Make a fur cloak. B: Leave. ")
+    if player_choice.lower().strip() == "a":
+        print("You take the bear's fur and fasion it into a stunning cloak that will keep you warm at night.")
+        player.max_health += 5
+        player.add_item("Bear fur coat", 1)
+        choice(area, location)
+    elif player_choice.lower().strip() == "b":
+        print("You leave nature to take care of the bear's corpse.")
+        choice(area, location)
+    else:
+        print("Error please choose A or B")
+
 #Main Choice
 
 def choice(area, location):
@@ -353,7 +495,6 @@ def choice(area, location):
                 choice_explore()
         elif action.lower().strip() == "d":
             print("You look around but are unable to find your way to another area.")
-
         else:
             print("Error")
 
@@ -369,4 +510,10 @@ def Name():
     print(f"Hello {name}!")
     choice_explore()
 
+bow = Weapon("Bow", 0, 15)
+sword = Weapon("Sword", 4, 10)
+player = Player([sword, bow])
+player.equip_weapon("Sword")
+player.add_item("Sword")
+player.add_item("Bow")
 Name()
