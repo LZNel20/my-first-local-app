@@ -6,6 +6,11 @@ class Weapon:
         self.min_damage = min_damage
         self.max_damage = max_damage
         self.crit_chance = crit_chance
+    
+    def upgrade(self):
+        self.min_damage += 2
+        self.max_damage += 3
+        print(f"Weapons Upgraded. {self.min_damage} {self.max_damage}")
         
 
     def roll_damage(self, dodging):
@@ -15,7 +20,7 @@ class Weapon:
         
         damage = random.randint(self.min_damage, self.max_damage)
             
-        if random.random() == 0:
+        if random.random() <= 0:
             print("You missed!")
 
         elif random.random() < self.crit_chance:
@@ -155,7 +160,8 @@ ITEM_DATA = {
     "Iron": {"type":"material"},
     "Coal": {"type":"material"},
     "Diamonds": {"type":"material"},
-    "Emeralds": {"type":"material"}}
+    "Emeralds": {"type":"material"},
+    "Draco info": {"type": "info"}}
 
 #####################################
 ###          Cave Code           ###
@@ -266,17 +272,15 @@ def deep_cave():
         print("You look at the pond for a moment longer before retracing your steps back to where you were.")
         return "cave stream"
 
-def dark_cave():
+def dark_cave(knowledge_Draco):
   
     #if player.dc_visits == 1:
     while True:
-        deep_c_input = "As you land you look around, you can barly see infront of you, the only light that seems to be in the cave is from the hole you fell through. \n A: Feel around in the dark, B: Try and climb back up the hole "
-        deep_c_input += "C: Figh the Dracp "
         if knowledge_Draco == True:
-            deep_cave_choice = input("As you land you look around, you can barly see infront of you, the only light that seems to be in the cave is from the hole you fell through. \n A: Feel around in the dark, B: Try and climb back up the hole C: Figh the Draco ")
+            dark_cave_choice = input("As you land you look around, you can barly see infront of you, the only light that seems to be in the cave is from the hole you fell through. \n A: Feel around in the dark, B: Try and climb back up the hole C: Fight the Draco ")
         else:
-            deep_cave_choice = input("As you land you look around, you can barly see infront of you, the only light that seems to be in the cave is from the hole you fell through. \n A: Feel around in the dark, B: Try and climb back up the hole ")
-            if deep_cave_choice.strip().lower() == "a":
+            dark_cave_choice = input("As you land you look around, you can barly see infront of you, the only light that seems to be in the cave is from the hole you fell through. \n A: Feel around in the dark, B: Try and climb back up the hole ")
+            if dark_cave_choice.strip().lower() == "a":
 
                 print("You feel around in dark for anything.")
                 event_chance = ["event", "clear", "clear", "clear", "clear", "clear"]
@@ -332,7 +336,7 @@ def dark_cave():
                     
                     continue
 
-                elif deep_cave_choice.strip().lower() == "b":
+                elif dark_cave_choice.strip().lower() == "b":
                     print("You try to climb back up the hole. Unfortunately it seems to steep to climb.")
                     continue
 
@@ -612,19 +616,24 @@ def bear_defeat():
 
 def choice(area, location):
    while True:
-        action = input("What would you like to do?: A: Explore, B: Eat, C: Check Inventory, D: Switch Area, ")
+        action = input("What would you like to do?: A: Explore, B: Eat, C: Check Inventory, D: Switch Area, E: Upgrade ")
 
         if action.lower().strip() == "a":
+
             if area == "cave":
                 return explore_cave()
+            
             elif area == "cave stream":
                 return cave_water()
+            
             elif area == "forest":
+
                 return explore_forest()
             elif area == "deep cave":
                 return deep_cave()
+            
             elif area == "Dark Cave":
-                return dark_cave()
+                return dark_cave(knowledge_Draco)
                 
             else:
                 print("Error")
@@ -633,14 +642,29 @@ def choice(area, location):
         elif action.lower().strip() == "b":
             player.eat_menu(area)
             continue
+        
         elif action.lower().strip() == "c":
             player.show_inventory() 
             continue
-        elif location != "lost":
-            if action.lower().strip() == "d":
-                return choice_explore()
+  
         elif action.lower().strip() == "d":
-            print("You look around but are unable to find your way to another area.")
+            return choice_explore()
+        
+        elif action.lower().strip() == "e":
+            choice_grade = input("Upgrade Weapons? Y/N ")
+            if choice_grade.lower().strip() == "yes" or "y":
+                if player.inventory.get("Iron", 0) >= 5 and player.inventory.get("Stick", 0) >= 2:
+                    print("You take a few moments and upgrade your weapons")
+                    player.inventory["Iron"] -= 5
+                    player.inventory["Stick"] -= 2
+                    player.equipped_weapon.upgrade()
+                
+                else:
+                    print("Not enough materials. Need 5 iron and 2 sticks")
+                    return area
+            elif choice_grade.lower().strip() == "no" or "n":
+                return area
+
         else:
             return area
 
@@ -682,11 +706,12 @@ def Name():
     print(f"Hello {name}!")
     game_start()
 
-bow = Weapon("Bow", 0, 15)
-sword = Weapon("Sword", 4, 10)
-mercenary = Mercenary([sword])
+player_bow = Weapon("Bow", 0, 15)
+player_sword = Weapon("Sword", 4, 10)
+mercenary_sword = Weapon("Sword", 4, 10)
+mercenary = Mercenary([mercenary_sword])
 mercenary.equip_weapon("Sword")
-player = Player([sword, bow])
+player = Player([player_sword, player_bow])
 player.equip_weapon("Sword")
 player.add_item("Sword")
 player.add_item("Bow")
