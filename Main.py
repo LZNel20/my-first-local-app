@@ -29,14 +29,14 @@ class Weapon:
 
         return damage
 
-#Ai helped fix the class
+#Ai helped fix the class and health functions
 class Player:
     #Basic stuff
     def __init__(self, weapons):
         self.weapons = weapons
         self.equipped_weapon = weapons[0] if weapons else None
         self.max_health = 35
-        self.health = self.max_health
+        self.health = 35
         self.inventory = {}
         self.dc_visits = 1
 
@@ -53,7 +53,7 @@ class Player:
         print("Weapon not found.")
     
     # Inventory stuff
-    def add_item(self, item_name, amount=1):
+    def add_item(self, item_name, amount = 1):
         self.inventory[item_name] = self.inventory.get(item_name, 0) + amount
 
     def show_inventory(self):
@@ -143,7 +143,15 @@ class Mercenary:
                 return
         print("Weapon not found.")
     
+class Draco:
+    def __init__(self):
+        self.max_health = 75
+        self.health = 75
+        self.life = True
 
+    #Damage stuff
+    def take_damage(self, amount):
+        self.health = max(0, self.health - amount)
 
 
 ITEM_DATA = {
@@ -161,7 +169,8 @@ ITEM_DATA = {
     "Coal": {"type":"material"},
     "Diamonds": {"type":"material"},
     "Emeralds": {"type":"material"},
-    "Draco info": {"type": "info"}}
+    "Draco info": {"type": "info"},
+    "Draco egg" : {"type": "prize"}}
 
 #####################################
 ###          Cave Code           ###
@@ -272,84 +281,165 @@ def deep_cave():
         print("You look at the pond for a moment longer before retracing your steps back to where you were.")
         return "cave stream"
 
-def dark_cave(knowledge_Draco):
+def dark_cave(area):
   
     #if player.dc_visits == 1:
     while True:
-        if knowledge_Draco == True:
-            dark_cave_choice = input("As you land you look around, you can barly see infront of you, the only light that seems to be in the cave is from the hole you fell through. \n A: Feel around in the dark, B: Try and climb back up the hole C: Fight the Draco ")
+        if player.inventory.get("Draco egg", 0) >= 1:
+            dark_c_prompt = "As you land you look around, you can barly see infront of you, the only light that seems to be in the cave is from the hole you fell through. \n A: Feel around in the dark, B: Try and climb back up the hole "
+            
+        elif player.inventory.get("Draco Info", 0) >= 1:
+            dark_c_prompt = "As you land you look around, you can barly see infront of you, the only light that seems to be in the cave is from the hole you fell through. \n A: Feel around in the dark, B: Try and climb back up the hole C: Fight the Draco "
+            
         else:
-            dark_cave_choice = input("As you land you look around, you can barly see infront of you, the only light that seems to be in the cave is from the hole you fell through. \n A: Feel around in the dark, B: Try and climb back up the hole ")
-            if dark_cave_choice.strip().lower() == "a":
+            dark_c_prompt = "As you land you look around, you can barly see infront of you, the only light that seems to be in the cave is from the hole you fell through. \n A: Feel around in the dark, B: Try and climb back up the hole "
+            
+        dark_cave_choice = input(dark_c_prompt)
 
-                print("You feel around in dark for anything.")
-                event_chance = ["event", "clear", "clear", "clear", "clear", "clear"]
-                random_event = random.choice(event_chance)
+        if dark_cave_choice.strip().lower() == "a":
 
-                if random_event == "event":
-                    print("You find hole that you are able to climb up, returning back to the original part of the cave.")
-                    return "deep cave"
-                
-                elif random_event == "clear":
-                    items_list = ["a rock", "a bug", "copper", "coal", "iron", "diamonds", "emeralds", "nothing", "deep growl"]
-                    random_item = random.choice(items_list)
+            print("You feel around in dark for anything.")
+            event_chance = ["event", "clear", "clear", "clear", "clear", "clear"]
+            random_event = random.choice(event_chance)
 
-                    if random_item == "a rock":
-                        print("+3 rock!")
-                        player.add_item("Rock", 3)
-                        continue
+            if random_event == "event":
+                print("You find hole that you are able to climb up, returning back to the original part of the cave.")
+                return "deep cave"
+            
+            elif random_event == "clear":
+                items_list = ["a rock", "a bug", "copper", "coal", "iron", "diamonds", "emeralds", "nothing", "deep growl"]
+                random_item = random.choice(items_list)
 
-                    elif random_item == "copper":
-                        print("+2 copper")
-                        player.add_item("Copper", 3)
-                        continue
-                    
-                    elif random_item == "iron":
-                        print("+3 iron!")
-                        player.add_item("Iron", 2)
-                        continue
-                    
-                    elif random_item == "coal":
-                        print("+2 coal!")
-                        player.add_item("Coal", 3)
-                        continue
-                    
-                    elif random_item == "diamonds":
-                        print("+1 diamonds!")
-                        player.add_item("Diamonds", 1)
-                        continue
-                    
-                    elif random_item == "emeralds":
-                        print("+1 emeralds!")
-                        player.add_item("Emeralds", 1)
-                        continue
-
-                    elif random_item == "nothing":
-                        print("You found nothing.")
-                        continue
-                        
-                    elif random_item == "deep growl":
-                        print("You hear a deep growl coming from deeper in the cave. You clearly arn't alone down here.")
-                        if knowledge_Draco == True:
-                            print("You think back to what the mercenary had said 'Draco'. You are sure the Draco is here")
-                            
-                    
+                if random_item == "a rock":
+                    print("+3 rock!")
+                    player.add_item("Rock", 3)
                     continue
 
-                elif dark_cave_choice.strip().lower() == "b":
-                    print("You try to climb back up the hole. Unfortunately it seems to steep to climb.")
+                elif random_item == "copper":
+                    print("+2 copper")
+                    player.add_item("Copper", 3)
+                    continue
+                
+                elif random_item == "iron":
+                    print("+3 iron!")
+                    player.add_item("Iron", 2)
+                    continue
+                
+                elif random_item == "coal":
+                    print("+2 coal!")
+                    player.add_item("Coal", 3)
+                    continue
+                
+                elif random_item == "diamonds":
+                    print("+1 diamonds!")
+                    player.add_item("Diamonds", 1)
+                    continue
+                
+                elif random_item == "emeralds":
+                    print("+1 emeralds!")
+                    player.add_item("Emeralds", 1)
                     continue
 
-   
-                
+                elif random_item == "nothing":
+                    print("You found nothing.")
+                    continue
+                    
+                elif random_item == "deep growl":
+                    print("You hear a deep growl coming from deeper in the cave. You clearly arn't alone down here.")
+                    if player.inventory.get("Draco Info", 0) >= 1:
+                        print("You think back to what the mercenary had said 'Draco'. You are sure the Draco is here")
+                        continue
+                continue
 
+        elif dark_cave_choice.strip().lower() == "b":
+            print("You try to climb back up the hole. Unfortunately it seems to steep to climb.")
+            continue
+
+        elif dark_cave_choice.strip().lower() == "c":
+            print("You go into the Draco's lair. As you do you see it, a large dragon, breathing fire out of the corners of its mouth, sitting on a mound of gold. \n You prepare yourself for the fight.")
+            draco_battle(area)
+
+def draco_battle(area):
+    while draco.health > 0 and player.health > 0:
+        dodging = False
+        action = input("A. Attack  B. Dodge  C. Switch Weapon D. Eat: ").lower().strip() 
+        if action.lower().strip() == "a":
+            damage = player.equipped_weapon.roll_damage(dodging)
+            Draco_attack = random.randrange(0, 25)
+            if Draco_attack < 1:
+                print("The Draco missed!")
+                draco.health -= damage
+                print(f"You did {damage} damage")
+                print(f"Current health: {player.health}. Current Draco health: {draco.health}.")
+
+            elif Draco_attack >= 1:
+                player.take_damage(Draco_attack)
+                print(f"Draco did {Draco_attack} damage.")
+                draco.take_damage(damage)
+                print(f"You did {damage} damage")
+                print(f"Current health: {player.health}. Current Draco health: {draco.health}.")
+
+        elif action.lower().strip() == "b":
+            if random.randint(1, 6) >= 4:
+                dodging = True
+                print("Successful dodge!")
+                damage = player.equipped_weapon.roll_damage(dodging)
+                draco.take_damage(damage)
+                print(f"You did {damage} damage")
+                print(f"Current health: {player.health}. Current Draco health: {draco.health}.")
+
+            else:
+                print("You failed to dodge!")
+                Draco_attack = random.randrange(0, 25)
+                player.take_damage(Draco_attack)
+                print(f"The Draco did {Draco_attack} damage!")
+                print(f"Current health: {player.health}. Current Draco health: {draco.health}.")
+                
+        elif action == "c":
+            for w in player.weapons:
+                if w == player.equipped_weapon:
+                    print(f"- {w.name} (Equipped)")
+                else:
+                    print(f"- {w.name}")
+
+            new_weapon = input("Which weapon would you like to equip? ")
+            player.equip_weapon(new_weapon)
+        
+        elif action == "d":
+            player.eat_menu(area)
+            continue
+
+        else:
+            print("Error please input A, B, C, or D.")
+    if player.health <= 0: 
+        player.health = 0
+        print("You died!") 
+        quit()
+    elif draco.health <= 0:
+        draco.health = 0
+        print("You defeated the Draco!")
+        print("+2 Fur \n +3 Iron \n +1 Diamond \n +2 Apples")
+        player.add_item("Fur", 2)
+        player.add_item("Iron", 3)
+        player.add_item("Diamonds", 1)
+        player.add_item("Apple", 2)
+        player.add_item("Draco Info", 1)
+        return victory(), 
+           
+def draco_victory():
+    print("After a dangerous and epic fight, you slay the Draco. You go about and grab what you find useful. The you see it. \n A large scaly egg. The Draco must have been protecting it.")
+    player.add_item("Draco egg", 1)
+    player.add_item("Iron", 60)
+    player.add_item("Emeralds", 50)
+    player.add_item("Diamonds", 35)
+    return victory_screen()
         
 
 #####################################
 ###         Forest Code          ###
 ###################################
 
-def explore_forest():
+def explore_forest(area):
    area = "forest"
    location = "!Lost"
    while True:
@@ -384,7 +474,7 @@ def explore_forest():
             return "forest"
          
         elif random_item == "a bear":
-            return bear_encounter()
+            return bear_encounter(area)
 
         elif random_item == "a deer":
             return deer_encounter(area, location)
@@ -393,7 +483,7 @@ def explore_forest():
             trap_chance = random.randrange(1, 4)
             if trap_chance == 3:
                 print("You fell into a trap! After a bit you are able to climb your way out of the trap but there seems to be someone waiting for you.")
-                mercenary_encounter(area, location)
+                mercenary_encounter(area)
                 
             else:
                 print("You are able to avoid falling into the trap.")
@@ -402,14 +492,14 @@ def explore_forest():
             return "forest"
 
 #Mercenary encounter
-def mercenary_encounter(area, location):
+def mercenary_encounter(area):
     print("The mercenary walks closer, saying, 'I know what you're doing here. You're here to kill the Draco as well!' \n Draco? This is the first you're hearing of it. You go to speak but the mercenary inturupts you. 'It doesn't matter I don't plan on sharing the gold anyway!' The mercenary draws his sword!")
-    mercenary_battle(area, location)
+    mercenary_battle(area)
 
-def mercenary_battle(area, location):
+def mercenary_battle(area):
     while mercenary.health > 0 and player.health > 0:
         dodging = False
-        action = input("A. Attack  B. Dodge  C. Switch Weapon: ").lower().strip() 
+        action = input("A. Attack  B. Dodge  C. Switch Weapon D. Eat ").lower().strip() 
         if action.lower().strip() == "a":
             damage = player.equipped_weapon.roll_damage(dodging)
             merc_attack = mercenary.equipped_weapon.roll_damage(dodging)
@@ -451,8 +541,13 @@ def mercenary_battle(area, location):
 
             new_weapon = input("Which weapon would you like to equip? ")
             player.equip_weapon(new_weapon)
+
+        elif action == "d":
+            player.eat_menu(area)
+            continue
+        
         else:
-            print("Error please input A, B, or C.")
+            print("Error please input A, B, C, or D.")
     if player.health <= 0: 
         player.health = 0
         print("You died!") 
@@ -465,13 +560,13 @@ def mercenary_battle(area, location):
         player.add_item("Iron", 3)
         player.add_item("Diamonds", 1)
         player.add_item("Apple", 2)
-        knowledge_Draco = True
-        return "forest", knowledge_Draco
+        player.add_item("Draco Info", 1)
+        return "forest", 
            
 
 #deer encounter
 
-def deer_encounter(area, location):
+def deer_encounter():
     
     battle_choice = input("Through the tree line you see a deer eating grass. Its long sprawling antlers make it seem bigger than actually is. " 
     "What would you like to do?: A: Hunt the deer B: Leave ")
@@ -486,10 +581,10 @@ def deer_encounter(area, location):
                 player.add_item("Meat", 3)
                 print("+3 fur!")
                 print("+3 Meat!")
-                choice(area, location)
+                return "forest"
             elif player_choice.lower().strip() == "b":
                     print("You loook at the fallen deer, leaving it to the forest. It will make a fine meal for a pack of wolves.")
-                    choice(area, location)
+                    return "forest"
             else:
                 print ("error")
                 
@@ -500,12 +595,12 @@ def deer_encounter(area, location):
         print("You admire the deer a little bit longer, then, with a snap of a twig, the deer runs of into the tree line.")
         return "forest"
 
-def bear_fight():
+def bear_fight(area):
     bear_health = 50
 
     while bear_health > 0 and player.health > 0:
         dodging = False
-        action = input("A. Attack  B. Dodge  C. Switch Weapon: ").lower().strip() 
+        action = input("A. Attack  B. Dodge  C. Switch Weapon D. Eat ").lower().strip() 
 
         if action.lower().strip() == "a":
             damage = player.equipped_weapon.roll_damage(dodging)
@@ -552,8 +647,12 @@ def bear_fight():
             new_weapon = input("Which weapon would you like to equip? ")
             player.equip_weapon(new_weapon)
 
+        elif action == "d":
+            player.eat_menu(area)
+            continue
+
         else:
-            print("Error please input A, B, or C.")
+            print("Error please input A, B, C, or D.")
            
     if player.health <= 0: 
         player.health = 0
@@ -575,12 +674,12 @@ def bear_fight():
             return "forest"
 
                 
-def bear_encounter():
+def bear_encounter(area):
     while True:
         print("The bear is attacking!")
         battle_choice = input("What will you do? A: Fight. B: Run. ")
         if battle_choice.lower().strip() == "a":
-            return bear_fight()
+            return bear_fight(area)
         elif battle_choice.lower().strip() == "b":
             print("You attempt to run from the bear.")
             escape_number = random.choice(range(1, 7))
@@ -591,7 +690,7 @@ def bear_encounter():
             else:
                 print("You failed to escape the bear!")
                 player.take_damage(random.randint(1, 6))
-                return bear_fight()
+                return bear_fight(area)
         else: 
             print("Error please pick A or B")
 
@@ -614,7 +713,7 @@ def bear_defeat():
 
 #Main Choice
 
-def choice(area, location):
+def choice(area):
    while True:
         action = input("What would you like to do?: A: Explore, B: Eat, C: Check Inventory, D: Switch Area, E: Upgrade ")
 
@@ -627,13 +726,13 @@ def choice(area, location):
                 return cave_water()
             
             elif area == "forest":
-
-                return explore_forest()
+                return explore_forest(area)
+            
             elif area == "deep cave":
                 return deep_cave()
             
             elif area == "Dark Cave":
-                return dark_cave(knowledge_Draco)
+                return dark_cave(area)
                 
             else:
                 print("Error")
@@ -672,8 +771,10 @@ def choice_explore():
     action_explore = input("Where do you want to explore? A: Forest, B: Cave ")
     if action_explore.lower() == "a":
         return "forest"
+    
     elif action_explore.lower() == "b":
         return "cave" 
+
     else:
         print("error")
         return None
@@ -699,7 +800,9 @@ def game_start():
             area = "deep cave"
         
 
-
+def victory_screen():
+    print("Congratulations! You beat my game, thanks for playing! I hope you enjoyed it and didn't face any annoying bugs. \nFeel free to continue playing or restart and try for cleaner win.")
+    return "forest"
 
 def Name():
     name = input("What is your Name? ")
@@ -712,8 +815,9 @@ mercenary_sword = Weapon("Sword", 4, 10)
 mercenary = Mercenary([mercenary_sword])
 mercenary.equip_weapon("Sword")
 player = Player([player_sword, player_bow])
+draco = Draco()
 player.equip_weapon("Sword")
 player.add_item("Sword")
 player.add_item("Bow")
-knowledge_Draco = False
+
 Name()
