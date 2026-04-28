@@ -14,6 +14,7 @@ class Weapon:
         
 
     def roll_damage(self, dodging):
+
         if dodging == True:
             damage = random.randint(0, 3)
             return damage
@@ -38,7 +39,6 @@ class Player:
         self.max_health = 35
         self.health = 35
         self.inventory = {}
-        self.dc_visits = 1
 
     #Damage stuff
     def take_damage(self, amount):
@@ -57,17 +57,19 @@ class Player:
         self.inventory[item_name] = self.inventory.get(item_name, 0) + amount
 
     def show_inventory(self):
+
         if not self.inventory:
             print("Your inventory is empty.")
             return
     
         print("Inventory:")
+
         for item, amount in self.inventory.items():
             print(f"{item}: {amount}")
 
     def use_item(self, item_name):
-        
         print(f"Current health: {self.health}/{self.max_health}")
+
         if self.inventory.get(item_name, 0) <= 0:
             print("You don't have that item.")
             return 
@@ -92,6 +94,7 @@ class Player:
             edible_items = []
 
             for item_name, amount in self.inventory.items():
+
                 if amount > 0 and ITEM_DATA.get(item_name, {}).get("type") == "food":
                     edible_items.append(item_name)
 
@@ -116,7 +119,9 @@ class Player:
                 return  
 
             found = False
+
             for item in edible_items:
+
                 if item.lower() == choice.lower():
                     self.use_item(item)
                     found = True
@@ -136,11 +141,14 @@ class Mercenary:
         self.health = max(0, self.health - amount)
     
     def equip_weapon(self, weapon_name):
+
         for w in self.weapons:
+
             if w.name.lower() == weapon_name.lower():
                 self.equipped_weapon = w
                 print(f"Equipped: {self.equipped_weapon.name}")
                 return
+            
         print("Weapon not found.")
     
 class Draco:
@@ -185,25 +193,32 @@ def explore_cave():
     if random_item == "You hear water":
         print(random_item)
         cave_choice = input("Go toward the water? A: Follow the noise, B: Keep exploring another way ")
+
         if cave_choice.lower().strip() == "a":
             return cave_water()
+        
         elif cave_choice.lower().strip() == "b":
             return "cave"
 
     print(f"You found: {random_item}!")
+
     if random_item == "a rock":
         print("+1 rock!")
         player.add_item("Rock", 1)
         return "cave"    
+    
     if random_item == "a bat":
         lost_chance = random.randrange(1, 11)
         print("The bat swoops around you. ")
+
         if lost_chance == 1:
+
             if player.inventory:
                 lost_item = random.choice(list(player.inventory.keys()))
                 print(f"The bat causes you to drop {lost_item}")
                 player.inventory[lost_item] -= 1
                 return "cave"
+            
         else:
             print("The bat leaves flying deeper into the cave.")
             return "cave"
@@ -283,7 +298,6 @@ def deep_cave():
 
 def dark_cave(area):
   
-    #if player.dc_visits == 1:
     while True:
         if player.inventory.get("Draco egg", 0) >= 1:
             dark_c_prompt = "As you land you look around, you can barly see infront of you, the only light that seems to be in the cave is from the hole you fell through. \n A: Feel around in the dark, B: Try and climb back up the hole "
@@ -359,6 +373,7 @@ def dark_cave(area):
             print("You go into the Draco's lair. As you do you see it, a large dragon, breathing fire out of the corners of its mouth, sitting on a mound of gold. \n You prepare yourself for the fight.")
             draco_battle(area)
 
+#Draco encounter
 def draco_battle(area):
     while draco.health > 0 and player.health > 0:
         dodging = False
@@ -801,7 +816,7 @@ def game_start():
         
 
 def victory_screen():
-    print("Congratulations! You beat my game, thanks for playing! I hope you enjoyed it and didn't face any annoying bugs. \nFeel free to continue playing or restart and try for cleaner win.")
+    print("Congratulations! You beat my game, thanks for playing! I hope you enjoyed it and didn't face any annoying bugs. \nFeel free to continue playing or restart and try for a cleaner win.")
     return "forest"
 
 def Name():
