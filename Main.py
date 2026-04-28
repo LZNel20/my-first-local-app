@@ -439,7 +439,7 @@ def draco_battle(area):
         player.add_item("Diamonds", 1)
         player.add_item("Apple", 2)
         player.add_item("Draco Info", 1)
-        return victory(), 
+        return draco_victory(), 
            
 def draco_victory():
     print("After a dangerous and epic fight, you slay the Draco. You go about and grab what you find useful. The you see it. \n A large scaly egg. The Draco must have been protecting it.")
@@ -492,7 +492,7 @@ def explore_forest(area):
             return bear_encounter(area)
 
         elif random_item == "a deer":
-            return deer_encounter(area, location)
+            return deer_encounter()
 
         elif random_item == "a trap":
             trap_chance = random.randrange(1, 4)
@@ -799,7 +799,7 @@ def game_start():
     area = "forest"
     location = "!lost"
     while True:
-        result = choice(area, location)
+        result = choice(area)
         if result == "forest":
             area = "forest"
             location = "!lost"
